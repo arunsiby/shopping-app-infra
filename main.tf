@@ -1,6 +1,5 @@
 # KeyPair Creation                         
 
-
 resource "aws_key_pair" "my_key" {
 
   key_name   = "${var.project_name}-${var.project_env}"
@@ -63,7 +62,7 @@ resource "aws_instance" "frontend" {
   ami                    = data.aws_ami.latest.id
   instance_type          = var.instance_type
   key_name               = aws_key_pair.my_key.key_name
-  vpc_security_group_ids = [resource.aws_security_group.shopping.id]
+  vpc_security_group_ids = [aws_security_group.shopping.id]
   tags = {
     "Name" = "${var.project_name}-${var.project_env}-frontend"
   }
@@ -78,9 +77,9 @@ resource "aws_instance" "frontend" {
 
 resource "aws_route53_record" "webserver" {
 
-  zone_id = data.aws_route53_zone.zone-details.id
+  zone_id = var.hosted_zone_id
   name    = "${var.hostname}.${var.hosted_zone_name}"
   type    = "A"
   ttl     = 300
-  records = [resource.aws_instance.frontend.public_ip]
+  records = [aws_instance.frontend.public_ip]
 }
